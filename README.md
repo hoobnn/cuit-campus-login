@@ -1,8 +1,8 @@
-<p align="center"><img src="windows/src/CUITNet.App/app.png" width="96" alt="CUIT 校园网图标"></p>
+# CUIT 校园网
 
-<h1 align="center">CUIT 校园网</h1>
+![CUIT 校园网图标](windows/src/CUITNet.App/app.png)
 
-<p align="center">成都信息工程大学校园网自动登录，macOS 与 Windows 原生应用</p>
+成都信息工程大学校园网自动登录，macOS 与 Windows 原生应用。
 
 连上校园网后自动完成认证，掉线自动重连。直接按门户协议发 HTTP 请求，不打开浏览器、不依赖浏览器驱动。
 
@@ -33,7 +33,7 @@
 
 ## 仓库结构
 
-```
+```text
 macos/      Swift Package：CUITNetCore（协议）+ CUITNet（SwiftUI 菜单栏应用）
 windows/    CUITNet.Core（协议，net9.0）+ CUITNet.App（WPF）+ 测试
 testing/    两端共用的本地假门户 fake_portal.py（端到端测试用）
@@ -61,7 +61,7 @@ assets/icon/build.sh
 
 ## 工作原理
 
-```
+```text
 探测外网 ──在线──> 什么都不做
    │
 被门户拦截（网关 302）
