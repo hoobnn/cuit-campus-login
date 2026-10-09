@@ -1,10 +1,16 @@
 #!/bin/bash
-# 构建 CUITNet.app（通用二进制，ad-hoc 签名）并打包成 zip。
-# 用法：scripts/build-app.sh [版本号]
+# 构建并签名 build/CUITNet.app（arm64 + x86_64 通用二进制）。
+#
+# 用法：scripts/build-app.sh [版本号] [构建号]
+#
+# 设置了 SIGN_IDENTITY（如 "Developer ID Application: 姓名 (TEAMID)"）时，
+# 用 Developer ID 签名并启用 Hardened Runtime 与安全时间戳，可以拿去公证；
+# 否则做 ad-hoc 签名，只适合本机调试。完整发布流程见 scripts/release.sh。
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
 VERSION="${1:-0.1.0}"
+BUILD="${2:-1}"
 OUT=build
 APP="$OUT/CUITNet.app"
 rm -rf "$OUT" && mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
@@ -27,7 +33,7 @@ cat > "$APP/Contents/Info.plist" <<PLIST
   <key>CFBundleIconFile</key><string>AppIcon</string>
   <key>CFBundlePackageType</key><string>APPL</string>
   <key>CFBundleShortVersionString</key><string>${VERSION}</string>
-  <key>CFBundleVersion</key><string>${VERSION}</string>
+  <key>CFBundleVersion</key><string>${BUILD}</string>
   <key>CFBundleDevelopmentRegion</key><string>zh_CN</string>
   <key>LSMinimumSystemVersion</key><string>14.0</string>
   <key>LSUIElement</key><true/>
@@ -42,6 +48,12 @@ cat > "$APP/Contents/Info.plist" <<PLIST
 </plist>
 PLIST
 
-codesign --force --deep --sign - "$APP"
-(cd "$OUT" && ditto -c -k --keepParent CUITNet.app "CUITNet-macos-${VERSION}.zip")
-echo "已生成 $OUT/CUITNet.app 和 $OUT/CUITNet-macos-${VERSION}.zip"
+if [[ -n "${SIGN_IDENTITY:-}" ]]; then
+  codesign --force --options runtime --timestamp \
+    --entitlements CUITNet.entitlements --sign "$SIGN_IDENTITY" "$APP"
+  echo "已用 Developer ID 签名：$SIGN_IDENTITY"
+else
+  codesign --force --sign - "$APP"
+  echo "未设置 SIGN_IDENTITY，已做 ad-hoc 签名（仅限本机调试）"
+fi
+codesign --verify --strict --verbose=2 "$APP"

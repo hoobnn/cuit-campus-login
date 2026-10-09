@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<!-- Hardened Runtime 下不需要任何例外：应用未沙盒化，网络与钥匙串访问都不需要额外授权 -->
+<plist version="1.0">
+<dict/>
+</plist>
