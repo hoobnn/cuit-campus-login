@@ -1,0 +1,66 @@
+name: build
+
+on:
+  push:
+    branches: [main]
+    tags: ["v*"]
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  macos:
+    runs-on: macos-15
+    defaults:
+      run:
+        working-directory: macos
+    steps:
+      - uses: actions/checkout@v4
+      - run: swift test
+      - run: scripts/build-app.sh "${GITHUB_REF_NAME#v}"
+        if: startsWith(github.ref, 'refs/tags/')
+      - run: scripts/build-app.sh 0.0.0-dev
+        if: ${{ !startsWith(github.ref, 'refs/tags/') }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CUITNet-macos
+          path: macos/build/*.zip
+
+  windows:
+    runs-on: windows-latest
+    defaults:
+      run:
+        working-directory: windows
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+      - run: dotnet test tests/CUITNet.Core.Tests
+      - run: >
+          dotnet publish src/CUITNet.App -c Release -r win-x64 --self-contained
+          -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true
+          -p:EnableCompressionInSingleFile=true -o publish
+      # 精简版：依赖已安装的 .NET 9 桌面运行时，体积约 1MB
+      - run: >
+          dotnet publish src/CUITNet.App -c Release -r win-x64 --no-self-contained
+          -p:PublishSingleFile=true -o publish-lite
+      - run: Move-Item publish-lite/CUITNet.exe publish/CUITNet-lite.exe
+      - uses: actions/upload-artifact@v4
+        with:
+          name: CUITNet-windows
+          path: windows/publish/CUITNet*.exe
+
+  release:
+    if: startsWith(github.ref, 'refs/tags/')
+    needs: [macos, windows]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: dist
+          merge-multiple: true
+      - uses: softprops/action-gh-release@v2
+        with:
+          files: dist/*
