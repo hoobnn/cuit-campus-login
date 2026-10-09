@@ -5,3 +5,4 @@ windows/**/obj/
 windows/publish/
 .DS_Store
 .vscode/
+node_modules/
