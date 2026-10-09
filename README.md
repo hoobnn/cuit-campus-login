@@ -26,7 +26,7 @@
 
 到 [Releases](../../releases) 下载：
 
-- **macOS**：`CUITNet-macos-<版本>.zip`，解压后把「CUIT 校园网」拖进「应用程序」。首次打开未签名应用会被拦截：右键 →「打开」，或在「系统设置 › 隐私与安全性」点「仍要打开」。
+- **macOS**：`CUITNet-<版本>.dmg`，打开后把「CUITNet」拖进「应用程序」。安装包经过 Developer ID 签名和 Apple 公证，可以直接打开。
 - **Windows**：`CUITNet.exe`（自带运行时，约 74 MB，双击即用）；已装 [.NET 9 桌面运行时](https://dotnet.microsoft.com/download/dotnet/9.0) 的可以下载 `CUITNet-lite.exe`（约 1 MB）。
 
 首次打开填学号、密码、选运营商即可。macOS 版常驻菜单栏，Windows 版关闭窗口后留在托盘。
@@ -47,7 +47,8 @@ assets/icon 手绘喜鹊图标的 SVG 源文件与生成脚本
 ```bash
 # macOS（需要 Xcode 16+）
 cd macos && swift test
-scripts/build-app.sh 0.1.0          # 生成 build/CUITNet.app 和 zip
+scripts/build-app.sh                # 生成 build/CUITNet.app（未设置签名证书时 ad-hoc 签名）
+scripts/release.sh 0.1.0            # 签名 + 公证 + DMG，见 docs/macos-signing.md
 
 # Windows（.NET 9 SDK；在 macOS 上也能编译和跑核心测试）
 cd windows && dotnet test tests/CUITNet.Core.Tests
@@ -57,7 +58,7 @@ dotnet publish src/CUITNet.App -c Release -r win-x64 --self-contained -p:Publish
 assets/icon/build.sh
 ```
 
-推送 `v*` 标签会由 GitHub Actions 构建两端安装包并发布 Release。
+推送 `v*` 标签会由 GitHub Actions 构建两端安装包并发布 Release；macOS 签名与公证的配置见 [docs/macos-signing.md](docs/macos-signing.md)。
 
 ## 工作原理
 
@@ -79,7 +80,6 @@ assets/icon/build.sh
 
 - 协议实现和测试基于社区对真实门户的逆向结果；作者本机不在校园网内，**尚未在真实门户上实测**。遇到问题请附上日志提 issue（macOS：菜单栏面板 →「日志」；Windows：主界面 →「打开日志」）。
 - 下线接口（`/eportal/network/offline`）验证较少；失败时可在自助服务中心 `http://10.254.241.66/self/index` 手动下线。
-- macOS 版未经 Apple 公证，首次打开需要手动放行。
 
 ## 致谢
 
