@@ -1,0 +1,47 @@
+name: Pages
+
+# 产品页与 Sparkle appcast（https://hoobnn.github.io/cuit-campus-login/appcast.xml）。
+# appcast 不提交进仓库，每次部署时从 GitHub Releases 生成。
+on:
+  push:
+    branches: [main]
+    paths: [site/**, .github/workflows/pages.yml]
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pages
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    permissions:
+      contents: read
+      pages: write
+      id-token: write
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    steps:
+      - uses: actions/checkout@v7
+      - name: Assemble site
+        run: |
+          mkdir -p _site
+          cp site/* _site/
+          cp windows/src/CUITNet.App/app.png _site/icon.png
+      - uses: hoobnn/ci-workflows/.github/actions/sparkle-appcast@v1
+        with:
+          output: _site/appcast.xml
+          artifact-basename: CUITNet
+          title: CUIT 校园网
+      - uses: actions/configure-pages@v6
+      - uses: actions/upload-pages-artifact@v5
+        with:
+          path: _site
+      - id: deploy
+        uses: actions/deploy-pages@v5

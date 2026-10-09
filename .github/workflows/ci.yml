@@ -1,0 +1,77 @@
+name: CI
+
+# 单元测试与未签名构建校验。推送 main、PR 时运行；release.yml 发版前也调用它。
+on:
+  push:
+    branches:
+      - main
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
+      - "site/**"
+      - "assets/**"
+      - "LICENSE"
+  pull_request:
+    paths-ignore:
+      - "**/*.md"
+      - "docs/**"
+      - "site/**"
+      - "assets/**"
+      - "LICENSE"
+  workflow_dispatch:
+  workflow_call:
+
+permissions:
+  contents: read
+
+# 同一分支上新的推送取消旧的运行。
+concurrency:
+  group: ci-${{ github.ref }}-${{ github.event_name }}
+  cancel-in-progress: true
+
+jobs:
+  macos:
+    name: macOS
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: 🧪 Unit tests
+        working-directory: macos
+        run: swift test
+
+      - name: 🔨 Build app (ad-hoc signature)
+        working-directory: macos
+        run: scripts/build-app.sh
+
+      - name: 🔍 Verify bundle
+        run: |
+          set -euo pipefail
+          APP=macos/build/CUITNet.app
+          BIN="$APP/Contents/MacOS/CUITNet"
+          lipo -archs "$BIN" | grep -q arm64
+          lipo -archs "$BIN" | grep -q x86_64
+          plutil -lint "$APP/Contents/Info.plist"
+          test -f "$APP/Contents/Resources/AppIcon.icns"
+          test -d "$APP/Contents/Frameworks/Sparkle.framework"
+          test ! -e "$APP/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices"
+          test -n "$(plutil -extract SUPublicEDKey raw "$APP/Contents/Info.plist")"
+          codesign --verify --deep --strict --verbose=2 "$APP"
+
+  windows:
+    name: Windows
+    runs-on: windows-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: windows
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "9.0.x"
+      - name: 🧪 Unit tests
+        run: dotnet test tests/CUITNet.Core.Tests
+      - name: 🔨 Build app
+        run: dotnet build src/CUITNet.App -c Release
