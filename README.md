@@ -12,6 +12,7 @@
 | 密码存储 | 钥匙串 | 凭据管理器 |
 | 开机启动 | `SMAppService` 登录项 | 注册表 `HKCU\…\Run` |
 | 网络变化感知 | `NWPathMonitor` + 睡眠唤醒 | `NetworkChange` + 电源恢复 |
+| 应用内更新 | Sparkle 2 | 暂无（通过 Releases 下载新版） |
 | 系统要求 | macOS 14+，Apple 芯片 / Intel 通用 | Windows 10 1809+ x64 |
 
 ## 功能
@@ -26,8 +27,8 @@
 
 到 [Releases](../../releases) 下载：
 
-- **macOS**：`CUITNet-<版本>.dmg`，打开后把「CUITNet」拖进「应用程序」。安装包经过 Developer ID 签名和 Apple 公证，可以直接打开。
-- **Windows**：`CUITNet.exe`（自带运行时，约 74 MB，双击即用）；已装 [.NET 9 桌面运行时](https://dotnet.microsoft.com/download/dotnet/9.0) 的可以下载 `CUITNet-lite.exe`（约 1 MB）。
+- **macOS**：`CUITNet-<版本>-macOS.dmg`，打开后把「CUITNet」拖进「应用程序」；或者用 Homebrew：`brew install --cask hoobnn/tap/cuitnet`。安装包经过 Developer ID 签名和 Apple 公证，之后通过应用内更新（Sparkle）自动升级。
+- **Windows**：`CUITNet-<版本>-Windows.exe`（自带运行时，约 74 MB，双击即用）；已装 [.NET 9 桌面运行时](https://dotnet.microsoft.com/download/dotnet/9.0) 的可以下载 `-Windows-lite.exe`（约 1 MB）。程序暂未签名，首次运行若出现 SmartScreen 提示，点「更多信息 → 仍要运行」。
 
 首次打开填学号、密码、选运营商即可。macOS 版常驻菜单栏，Windows 版关闭窗口后留在托盘。
 
@@ -38,6 +39,7 @@ macos/      Swift Package：CUITNetCore（协议）+ CUITNet（SwiftUI 菜单栏
 windows/    CUITNet.Core（协议，net9.0）+ CUITNet.App（WPF）+ 测试
 testing/    两端共用的本地假门户 fake_portal.py（端到端测试用）
 assets/icon 手绘喜鹊图标的 SVG 源文件与生成脚本
+site/       产品页（GitHub Pages，同时提供 Sparkle 的 appcast.xml）
 ```
 
 ## 构建与测试
@@ -47,8 +49,7 @@ assets/icon 手绘喜鹊图标的 SVG 源文件与生成脚本
 ```bash
 # macOS（需要 Xcode 16+）
 cd macos && swift test
-scripts/build-app.sh                # 生成 build/CUITNet.app（未设置签名证书时 ad-hoc 签名）
-scripts/release.sh 0.1.0            # 签名 + 公证 + DMG，见 docs/macos-signing.md
+scripts/build-app.sh                # 生成 build/CUITNet.app（内嵌 Sparkle；未设置签名证书时 ad-hoc 签名）
 
 # Windows（.NET 9 SDK；在 macOS 上也能编译和跑核心测试）
 cd windows && dotnet test tests/CUITNet.Core.Tests
@@ -58,7 +59,7 @@ dotnet publish src/CUITNet.App -c Release -r win-x64 --self-contained -p:Publish
 assets/icon/build.sh
 ```
 
-推送 `v*` 标签会由 GitHub Actions 构建两端安装包并发布 Release；macOS 签名与公证的配置见 [docs/macos-signing.md](docs/macos-signing.md)。
+推送 `v*` 标签由 GitHub Actions 完成签名、公证、发布 Release、同步 Homebrew 和更新 appcast，见 [docs/RELEASE.md](docs/RELEASE.md)。
 
 ## 工作原理
 
