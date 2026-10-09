@@ -1,0 +1,28 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <UseWindowsForms>true</UseWindowsForms>
+    <EnableWindowsTargeting>true</EnableWindowsTargeting>
+    <AssemblyName>CUITNet</AssemblyName>
+    <RootNamespace>CUITNet.App</RootNamespace>
+    <Product>CUIT 校园网</Product>
+    <Version>0.1.0</Version>
+    <ApplicationIcon Condition="Exists('app.ico')">app.ico</ApplicationIcon>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <!-- .NET 9 的 Fluent 主题（ThemeMode）仍标记为实验性 API -->
+    <NoWarn>$(NoWarn);WPF0001</NoWarn>
+  </PropertyGroup>
+  <ItemGroup>
+    <!-- WinForms 只用来做托盘图标，避免和 WPF 的同名类型冲突 -->
+    <Using Remove="System.Windows.Forms" />
+    <Using Remove="System.Drawing" />
+    <Resource Include="app.png" Condition="Exists('app.png')" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\CUITNet.Core\CUITNet.Core.csproj" />
+  </ItemGroup>
+</Project>

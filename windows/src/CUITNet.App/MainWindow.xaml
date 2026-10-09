@@ -1,0 +1,185 @@
+<Window x:Class="CUITNet.App.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:local="clr-namespace:CUITNet.App"
+        x:Name="Root"
+        Title="CUIT 校园网"
+        Width="480" SizeToContent="Height" ResizeMode="CanMinimize"
+        WindowStartupLocation="CenterScreen"
+        FontFamily="Segoe UI Variable Text, Microsoft YaHei UI">
+  <Window.Resources>
+    <BooleanToVisibilityConverter x:Key="BoolToVis" />
+  </Window.Resources>
+
+  <ScrollViewer VerticalScrollBarVisibility="Auto">
+    <StackPanel Margin="24,16,24,24">
+
+      <!-- 标题 -->
+      <Grid Margin="0,0,0,20">
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+        <Image x:Name="Logo" Width="48" Height="48" Margin="0,0,14,0" RenderOptions.BitmapScalingMode="HighQuality" />
+        <StackPanel Grid.Column="1" VerticalAlignment="Center">
+          <TextBlock Text="CUIT 校园网" FontSize="22" FontWeight="SemiBold" />
+          <TextBlock Text="连上校园网后自动完成认证，掉线自动重连" Style="{StaticResource Caption}" />
+        </StackPanel>
+      </Grid>
+
+      <!-- 状态 -->
+      <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+            <ColumnDefinition Width="Auto" />
+          </Grid.ColumnDefinitions>
+          <Ellipse Width="12" Height="12" Margin="2,0,14,0" VerticalAlignment="Center">
+            <Ellipse.Style>
+              <Style TargetType="Ellipse">
+                <Setter Property="Fill" Value="#0F6CBD" />
+                <Style.Triggers>
+                  <DataTrigger Binding="{Binding Status}" Value="{x:Static local:StatusKind.Online}">
+                    <Setter Property="Fill" Value="#0E7A0D" />
+                  </DataTrigger>
+                  <DataTrigger Binding="{Binding Status}" Value="{x:Static local:StatusKind.Captive}">
+                    <Setter Property="Fill" Value="#D97706" />
+                  </DataTrigger>
+                  <DataTrigger Binding="{Binding Status}" Value="{x:Static local:StatusKind.Failed}">
+                    <Setter Property="Fill" Value="#D97706" />
+                  </DataTrigger>
+                  <DataTrigger Binding="{Binding Status}" Value="{x:Static local:StatusKind.Rejected}">
+                    <Setter Property="Fill" Value="#C42B1C" />
+                  </DataTrigger>
+                  <DataTrigger Binding="{Binding Status}" Value="{x:Static local:StatusKind.NoNetwork}">
+                    <Setter Property="Fill" Value="#C42B1C" />
+                  </DataTrigger>
+                </Style.Triggers>
+              </Style>
+            </Ellipse.Style>
+          </Ellipse>
+          <StackPanel Grid.Column="1" VerticalAlignment="Center">
+            <TextBlock Text="{Binding StatusTitle}" FontSize="18" FontWeight="SemiBold" />
+            <TextBlock Text="{Binding Subtitle}" Style="{StaticResource Caption}" TextWrapping="Wrap" />
+          </StackPanel>
+          <Grid Grid.Column="2" VerticalAlignment="Center" Margin="12,0,0,0">
+            <Button x:Name="LogoutButton" Content="下线" MinWidth="96" Click="Logout_Click"
+                    Visibility="{Binding IsOnline, Converter={StaticResource BoolToVis}}" />
+            <ProgressBar IsIndeterminate="True" Width="96"
+                         Visibility="{Binding IsBusy, Converter={StaticResource BoolToVis}}" />
+          </Grid>
+        </Grid>
+      </Border>
+
+      <!-- 账号 -->
+      <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+        <Grid>
+          <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="Auto" />
+            <ColumnDefinition Width="*" />
+          </Grid.ColumnDefinitions>
+          <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+          </Grid.RowDefinitions>
+          <TextBlock Text="学号" Style="{StaticResource FieldLabel}" />
+          <TextBox x:Name="UsernameBox" Grid.Column="1" Margin="0,0,0,10" />
+          <TextBlock Grid.Row="1" Text="密码" Style="{StaticResource FieldLabel}" />
+          <PasswordBox x:Name="PasswordBox" Grid.Row="1" Grid.Column="1" Margin="0,0,0,10" />
+          <TextBlock Grid.Row="2" Text="运营商" Style="{StaticResource FieldLabel}" />
+          <StackPanel Grid.Row="2" Grid.Column="1" Orientation="Horizontal">
+            <RadioButton x:Name="CmccRadio" Content="移动" GroupName="Carrier" Margin="0,0,20,0" />
+            <RadioButton x:Name="CtccRadio" Content="电信" GroupName="Carrier" Margin="0,0,20,0" />
+            <RadioButton x:Name="UnicomRadio" Content="联通" GroupName="Carrier" />
+          </StackPanel>
+          <TextBlock Grid.Row="3" Grid.ColumnSpan="2" Margin="0,12,0,0" Style="{StaticResource Caption}" TextWrapping="Wrap"
+                     Text="密码保存在 Windows 凭据管理器中，只会发送给学校的认证服务器。" />
+        </Grid>
+      </Border>
+
+      <!-- 选项 -->
+      <Border Style="{StaticResource Card}" Margin="0,0,0,12">
+        <StackPanel>
+          <CheckBox Content="自动保持在线（掉线自动重连）" IsChecked="{Binding KeepOnline}" Margin="0,0,0,8" />
+          <CheckBox Content="开机时启动" IsChecked="{Binding LaunchAtLogin}" />
+          <Expander Header="高级" Margin="0,12,0,0">
+            <Grid Margin="0,8,0,0">
+              <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto" />
+                <ColumnDefinition Width="*" />
+              </Grid.ColumnDefinitions>
+              <Grid.RowDefinitions>
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+                <RowDefinition Height="Auto" />
+              </Grid.RowDefinitions>
+              <TextBlock Text="认证服务器" Style="{StaticResource FieldLabel}" />
+              <TextBox x:Name="PortalBox" Grid.Column="1" Margin="0,0,0,10" />
+              <TextBlock Grid.Row="1" Text="接入设备" Style="{StaticResource FieldLabel}" />
+              <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding NasIp}" VerticalAlignment="Center"
+                         Foreground="{DynamicResource TextFillColorSecondaryBrush}" Margin="0,0,0,10" />
+              <Button Grid.Row="2" Grid.ColumnSpan="2" Content="打开自助服务中心" HorizontalAlignment="Left"
+                      Click="SelfService_Click" />
+            </Grid>
+          </Expander>
+        </StackPanel>
+      </Border>
+
+      <!-- 最近活动 -->
+      <Border Style="{StaticResource Card}" Margin="0,0,0,20"
+              Visibility="{Binding HasActivity, ElementName=Root, Converter={StaticResource BoolToVis}}">
+        <ItemsControl ItemsSource="{Binding Activity}" MaxHeight="120">
+          <ItemsControl.Template>
+            <ControlTemplate TargetType="ItemsControl">
+              <ScrollViewer VerticalScrollBarVisibility="Auto">
+                <ItemsPresenter />
+              </ScrollViewer>
+            </ControlTemplate>
+          </ItemsControl.Template>
+          <ItemsControl.ItemTemplate>
+            <DataTemplate>
+              <Grid Margin="0,2">
+                <Grid.ColumnDefinitions>
+                  <ColumnDefinition Width="44" />
+                  <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+                <TextBlock Text="{Binding TimeText}" Style="{StaticResource Caption}" />
+                <TextBlock Grid.Column="1" Text="{Binding Text}" FontSize="12" TextWrapping="Wrap">
+                  <TextBlock.Style>
+                    <Style TargetType="TextBlock">
+                      <Setter Property="Foreground" Value="{DynamicResource TextFillColorSecondaryBrush}" />
+                      <Style.Triggers>
+                        <DataTrigger Binding="{Binding IsError}" Value="True">
+                          <Setter Property="Foreground" Value="#C42B1C" />
+                        </DataTrigger>
+                      </Style.Triggers>
+                    </Style>
+                  </TextBlock.Style>
+                </TextBlock>
+              </Grid>
+            </DataTemplate>
+          </ItemsControl.ItemTemplate>
+        </ItemsControl>
+      </Border>
+
+      <!-- 操作 -->
+      <Grid>
+        <Grid.ColumnDefinitions>
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="Auto" />
+          <ColumnDefinition Width="*" />
+          <ColumnDefinition Width="Auto" />
+        </Grid.ColumnDefinitions>
+        <Button Content="检测状态" Click="Refresh_Click" Margin="0,0,8,0" />
+        <Button Grid.Column="1" Content="打开日志" Click="OpenLog_Click" />
+        <TextBlock x:Name="ErrorText" Grid.Column="2" Margin="12,0" VerticalAlignment="Center"
+                   Foreground="#C42B1C" TextTrimming="CharacterEllipsis" />
+        <Button Grid.Column="3" Content="保存并登录" MinWidth="120" IsDefault="True"
+                Style="{DynamicResource AccentButtonStyle}" Click="Save_Click" />
+      </Grid>
+    </StackPanel>
+  </ScrollViewer>
+</Window>
