@@ -1,0 +1,7 @@
+macos/.build/
+macos/build/
+windows/**/bin/
+windows/**/obj/
+windows/publish/
+.DS_Store
+.vscode/
