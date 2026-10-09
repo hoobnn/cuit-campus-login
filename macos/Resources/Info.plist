@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>CFBundleName</key>
+	<string>CUITNet</string>
+	<key>CFBundleDisplayName</key>
+	<string>CUIT 校园网</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.ikuyu.cuitnet</string>
+	<key>CFBundleExecutable</key>
+	<string>CUITNet</string>
+	<key>CFBundleIconFile</key>
+	<string>AppIcon</string>
+	<key>CFBundlePackageType</key>
+	<string>APPL</string>
+	<!-- 发版时两者一起改，tag 必须与 CFBundleShortVersionString 一致（见 docs/RELEASE.md） -->
+	<key>CFBundleShortVersionString</key>
+	<string>0.1.0</string>
+	<key>CFBundleVersion</key>
+	<string>0.1.0</string>
+	<key>CFBundleDevelopmentRegion</key>
+	<string>zh_CN</string>
+	<key>LSMinimumSystemVersion</key>
+	<string>14.0</string>
+	<key>LSUIElement</key>
+	<true/>
+	<key>LSApplicationCategoryType</key>
+	<string>public.app-category.utilities</string>
+	<key>NSHumanReadableCopyright</key>
+	<string>MIT License</string>
+	<!-- 门户和联网探测都是明文 HTTP -->
+	<key>NSAppTransportSecurity</key>
+	<dict>
+		<key>NSAllowsArbitraryLoads</key>
+		<true/>
+	</dict>
+	<key>NSLocalNetworkUsageDescription</key>
+	<string>需要访问校园网认证服务器以完成登录。</string>
+	<!-- Sparkle：appcast 由 Pages 从 GitHub Releases 生成；github.io 在国内比 raw.githubusercontent.com 可达 -->
+	<key>SUFeedURL</key>
+	<string>https://hoobnn.github.io/cuit-campus-login/appcast.xml</string>
+	<key>SUPublicEDKey</key>
+	<string>zXY9xu3LClNzRrZ0HJvJWQTzotbFNSA8OFKuq6G+7BU=</string>
+	<key>SUEnableAutomaticChecks</key>
+	<true/>
+</dict>
+</plist>

@@ -4,6 +4,7 @@ import SwiftUI
 /// 点击菜单栏图标弹出的面板。
 struct MenuPanel: View {
     @Environment(AppModel.self) private var model
+    private let updater = Updater.shared
 
     var body: some View {
         @Bindable var model = model
@@ -37,6 +38,9 @@ struct MenuPanel: View {
             HStack {
                 Button("设置…") { SettingsWindow.show() }
                 Button("日志") { model.openLog() }
+                if updater.canCheck {
+                    Button("检查更新…") { updater.checkForUpdates() }
+                }
                 Spacer()
                 Button("退出") { NSApp.terminate(nil) }
             }

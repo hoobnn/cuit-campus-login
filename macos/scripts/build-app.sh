@@ -1,59 +1,41 @@
 #!/bin/bash
-# 构建并签名 build/CUITNet.app（arm64 + x86_64 通用二进制）。
+# 构建并签名 build/CUITNet.app（arm64 + x86_64 通用二进制，内嵌 Sparkle）。
 #
-# 用法：scripts/build-app.sh [版本号] [构建号]
-#
-# 设置了 SIGN_IDENTITY（如 "Developer ID Application: 姓名 (TEAMID)"）时，
-# 用 Developer ID 签名并启用 Hardened Runtime 与安全时间戳，可以拿去公证；
-# 否则做 ad-hoc 签名，只适合本机调试。完整发布流程见 scripts/release.sh。
+# 版本号以 Resources/Info.plist 为准。设置了 APPLE_SIGN_IDENTITY_APPLICATION
+# （证书全名或 SHA-1 指纹）时用 Developer ID 签名并启用 Hardened Runtime 与安全时间戳；
+# 否则 ad-hoc 签名，只适合本机调试。正式发布由 CI 调用 hoobnn/ci-workflows 完成，
+# 见 docs/RELEASE.md。
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
-VERSION="${1:-0.1.0}"
-BUILD="${2:-1}"
 OUT=build
 APP="$OUT/CUITNet.app"
-rm -rf "$OUT" && mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources"
+rm -rf "$OUT" && mkdir -p "$APP/Contents/MacOS" "$APP/Contents/Resources" "$APP/Contents/Frameworks"
 
-swift build -c release --arch arm64 --arch x86_64
-cp "$(swift build -c release --arch arm64 --arch x86_64 --show-bin-path)/CUITNet" "$APP/Contents/MacOS/CUITNet"
-
+ARCHS=(--arch arm64 --arch x86_64)
+swift build -c release "${ARCHS[@]}"
+cp "$(swift build -c release "${ARCHS[@]}" --show-bin-path)/CUITNet" "$APP/Contents/MacOS/CUITNet"
+cp Resources/Info.plist "$APP/Contents/Info.plist"
 # 图标由 assets/icon/build.sh 从 SVG 生成
 cp Resources/AppIcon.icns "$APP/Contents/Resources/AppIcon.icns"
 
-cat > "$APP/Contents/Info.plist" <<PLIST
-<?xml version="1.0" encoding="UTF-8"?>
-<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
-<plist version="1.0">
-<dict>
-  <key>CFBundleName</key><string>CUITNet</string>
-  <key>CFBundleDisplayName</key><string>CUIT 校园网</string>
-  <key>CFBundleIdentifier</key><string>com.ikuyu.cuitnet</string>
-  <key>CFBundleExecutable</key><string>CUITNet</string>
-  <key>CFBundleIconFile</key><string>AppIcon</string>
-  <key>CFBundlePackageType</key><string>APPL</string>
-  <key>CFBundleShortVersionString</key><string>${VERSION}</string>
-  <key>CFBundleVersion</key><string>${BUILD}</string>
-  <key>CFBundleDevelopmentRegion</key><string>zh_CN</string>
-  <key>LSMinimumSystemVersion</key><string>14.0</string>
-  <key>LSUIElement</key><true/>
-  <key>LSApplicationCategoryType</key><string>public.app-category.utilities</string>
-  <key>NSHumanReadableCopyright</key><string>MIT License</string>
-  <!-- 门户和联网探测都是明文 HTTP -->
-  <key>NSAppTransportSecurity</key>
-  <dict><key>NSAllowsArbitraryLoads</key><true/></dict>
-  <key>NSLocalNetworkUsageDescription</key>
-  <string>需要访问校园网认证服务器以完成登录。</string>
-</dict>
-</plist>
-PLIST
+# Sparkle：应用没有沙盒化，用不到它的 XPC 服务，去掉以免多签一层
+SPARKLE_SRC=.build/artifacts/sparkle/Sparkle/Sparkle.xcframework/macos-arm64_x86_64/Sparkle.framework
+test -d "$SPARKLE_SRC" || { echo "SwiftPM 没有解析出 Sparkle.framework" >&2; exit 1; }
+ditto "$SPARKLE_SRC" "$APP/Contents/Frameworks/Sparkle.framework"
+rm -rf "$APP/Contents/Frameworks/Sparkle.framework/Versions/B/XPCServices" \
+       "$APP/Contents/Frameworks/Sparkle.framework/XPCServices"
 
-if [[ -n "${SIGN_IDENTITY:-}" ]]; then
-  codesign --force --options runtime --timestamp \
-    --entitlements CUITNet.entitlements --sign "$SIGN_IDENTITY" "$APP"
-  echo "已用 Developer ID 签名：$SIGN_IDENTITY"
-else
-  codesign --force --sign - "$APP"
-  echo "未设置 SIGN_IDENTITY，已做 ad-hoc 签名（仅限本机调试）"
-fi
-codesign --verify --strict --verbose=2 "$APP"
+xattr -cr "$APP"
+IDENTITY="${APPLE_SIGN_IDENTITY_APPLICATION:--}"
+OPTS=(--force --sign "$IDENTITY")
+[[ "$IDENTITY" != "-" ]] && OPTS+=(--options runtime --timestamp)
+
+# 由内向外签名：Sparkle 的辅助程序 → 框架 → 应用
+SPARKLE=Contents/Frameworks/Sparkle.framework/Versions/B
+for inner in "$SPARKLE/Autoupdate" "$SPARKLE/Updater.app" Contents/Frameworks/Sparkle.framework; do
+  codesign "${OPTS[@]}" "$APP/$inner"
+done
+codesign "${OPTS[@]}" --entitlements CUITNet.entitlements "$APP"
+codesign --verify --deep --strict --verbose=2 "$APP"
+echo "已生成 ${APP}（签名身份：${IDENTITY}）"

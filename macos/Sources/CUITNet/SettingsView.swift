@@ -39,6 +39,12 @@ struct SettingsView: View {
                         .foregroundStyle(.secondary)
                 }
 
+                Section("更新") {
+                    LabeledContent("当前版本", value: Updater.shared.version)
+                    Toggle("自动检查更新", isOn: Binding(get: { Updater.shared.automaticallyChecks },
+                                                     set: { Updater.shared.automaticallyChecks = $0 }))
+                }
+
                 Section("高级") {
                     TextField("认证服务器", text: $portal)
                     LabeledContent("接入设备", value: model.nasIP.isEmpty ? "首次登录后自动识别" : model.nasIP)
@@ -68,7 +74,7 @@ struct SettingsView: View {
             .padding(.horizontal, 20)
             .padding(.bottom, 20)
         }
-        .frame(width: 440, height: 545)
+        .frame(width: 440, height: 700)
         .onAppear {
             username = model.username
             password = model.password()

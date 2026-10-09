@@ -22,6 +22,7 @@ struct CUITNetApp: App {
 final class AppDelegate: NSObject, NSApplicationDelegate {
     func applicationDidFinishLaunching(_ notification: Notification) {
         // 首次运行还没有账号：直接弹出设置窗口
+        _ = Updater.shared  // 启动 Sparkle 的定期检查
         if !AppModel.shared.hasAccount { SettingsWindow.show() }
         #if DEBUG
         // 截图预览菜单栏面板：CUITNET_PREVIEW_PANEL=1 swift run
