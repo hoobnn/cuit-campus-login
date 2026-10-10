@@ -132,4 +132,6 @@ site/       产品页（GitHub Pages，同时提供 Sparkle 的 appcast.xml）
 - [DECKS555/campus-login](https://github.com/DECKS555/campus-login)（MIT）：serviceLogin 判定方式
 - [gs-eng/cuitauto](https://github.com/gs-eng/cuitauto)：门户接口梳理
 
-[MIT](LICENSE) © 2026 hoobnn
+## 许可证
+
+[MIT](LICENSE) © 2026 hoobnn。可自由使用、修改和分发，需保留版权声明。
