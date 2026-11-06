@@ -1,10 +1,12 @@
 <div align="center">
 
-<img src="windows/src/CUITNet.App/app.png" width="112" alt="CUIT 校园网应用图标">
+<img src="windows/src/CUITNet.App/app.png" width="112" alt="CUIT 校园网应用图标：手绘风喜鹊">
 
 # CUIT 校园网：成都信息工程大学校园网自动登录
 
 macOS 与 Windows 原生应用，连上校园网自动认证，掉线自动重连。
+
+简体中文 | [English](README.en.md)
 
 [![Release](https://img.shields.io/github/v/release/hoobnn/cuit-campus-login?style=flat-square)](https://github.com/hoobnn/cuit-campus-login/releases/latest)
 [![CI](https://img.shields.io/github/actions/workflow/status/hoobnn/cuit-campus-login/ci.yml?branch=main&style=flat-square&label=CI)](https://github.com/hoobnn/cuit-campus-login/actions/workflows/ci.yml)
@@ -15,7 +17,7 @@ macOS 与 Windows 原生应用，连上校园网自动认证，掉线自动重�
 
 </div>
 
-CUIT 校园网直接按门户协议发 HTTP 请求完成认证，不打开浏览器，也不依赖浏览器驱动。macOS 版常驻菜单栏，Windows 版关闭窗口后留在托盘。
+CUIT 校园网（CUITNet）是成都信息工程大学（CUIT）校园网的开源自动登录工具，免费，MIT 许可。它是 macOS（Swift / SwiftUI 菜单栏应用）和 Windows（.NET 9 / WPF 托盘应用）原生程序，直接按锐捷 SAM 门户协议发 HTTP 请求完成认证，不打开浏览器，也不依赖 Selenium 等浏览器驱动；检测到掉线会自动重新登录。macOS 版常驻菜单栏，Windows 版关闭窗口后留在托盘。
 
 ## 功能
 
@@ -86,6 +88,35 @@ brew install --cask hoobnn/tap/cuitnet
 ```
 
 密码加密与门户前端 CryptoJS 逐字节一致，两端都用真实门户抓到的密文做了校验。
+
+## 常见问题
+
+**成都信息工程大学校园网怎么实现自动登录？**
+安装本应用，填一次学号、密码并选运营商（移动 / 电信 / 联通）。之后它在后台检测网络，被门户拦截就自动重新登录，换网络或从睡眠唤醒时立即检测。
+
+**需要装浏览器或 Selenium 吗？**
+不需要。应用按门户协议直接发 HTTP 请求，没有浏览器、驱动或 Python 环境依赖。
+
+**支持哪些系统？**
+macOS 14 及以上（Apple 芯片和 Intel 通用），Windows 10 1809 及以上（x64）。Linux 和手机暂不支持。
+
+**密码存在哪里，安全吗？**
+macOS 存在系统钥匙串（服务名 `CUITNet`），Windows 存在凭据管理器（`CUITNet:<学号>`），不写入明文配置文件。认证请求只发往校园网门户。
+
+**会不会因为密码错误反复重试导致账号被锁？**
+不会。门户提示密码错误后应用立即停止重试，改好密码后才自动恢复。
+
+**开着 Clash 等代理还能登录吗？**
+可以。认证请求强制直连，不走系统代理。
+
+**真的能用吗？**
+协议实现按社区对真实门户的逆向结果编写，并用本地假门户做了端到端测试；但作者本机不在校园网内，**尚未在真实门户上实测**，Windows 界面也还没有在真机上运行验证。遇到问题请附日志提 [issue](https://github.com/hoobnn/cuit-campus-login/issues)。
+
+**免费吗？可以用在其他学校的校园网吗？**
+免费，MIT 许可。协议实现针对成都信息工程大学的门户（锐捷 SAM 5.x + CAS 单点登录）；其他学校的门户接口不同，不保证可用。
+
+**有哪些替代方案？**
+想用 Python + Selenium 脚本的话，可以看 [miaoxi-awa/CUIT-Auto-Campus-Login](https://github.com/miaoxi-awa/CUIT-Auto-Campus-Login)（本项目的起点），见文末致谢。想要原生应用、不开浏览器、带菜单栏 / 托盘和开机启动，用本项目。
 
 ## 已知限制
 

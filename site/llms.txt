@@ -1,0 +1,22 @@
+# CUIT 校园网 (CUITNet)
+
+> CUITNet is a free, open-source (MIT) auto-login tool for the campus network of Chengdu University of Information Technology (CUIT, 成都信息工程大学): a native macOS menu bar app and a native Windows tray app that sign in to the campus portal over plain HTTP (no browser, no Selenium) and reconnect when the connection drops. 成都信息工程大学校园网自动登录工具，macOS 与 Windows 原生应用，掉线自动重连。
+
+Key facts:
+
+- Website: https://hoobnn.github.io/cuit-campus-login/
+- Source code: https://github.com/hoobnn/cuit-campus-login
+- Download: https://github.com/hoobnn/cuit-campus-login/releases/latest (macOS 14+, Apple silicon and Intel, signed and notarized; Windows 10 1809+ x64, not code-signed)
+- Install on macOS: `brew install --cask hoobnn/tap/cuitnet`
+- Price and license: free, MIT.
+- Portal: Ruijie SAM 5.x with CAS single sign-on, CUIT only; other universities are not guaranteed to work.
+- Features: carrier selection (China Mobile / Telecom / Unicom), background online check with backoff, stops retrying after a wrong password to avoid lockout, bypasses system proxies such as Clash, notifications, launch at login.
+- Credentials: macOS Keychain / Windows Credential Manager.
+- Status: protocol follows community reverse-engineering and is tested against a local fake portal; not yet verified against the real portal.
+- Author: hoobnn (https://github.com/hoobnn, https://www.ikuyu.com)
+
+## Docs
+
+- [README (简体中文)](https://raw.githubusercontent.com/hoobnn/cuit-campus-login/main/README.md): features, install, FAQ, how it works, build from source
+- [README (English)](https://raw.githubusercontent.com/hoobnn/cuit-campus-login/main/README.en.md): the same in English
+- [Release process](https://raw.githubusercontent.com/hoobnn/cuit-campus-login/main/docs/RELEASE.md): signing, notarization, Sparkle appcast, Homebrew sync
