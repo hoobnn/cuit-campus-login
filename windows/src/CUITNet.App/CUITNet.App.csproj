@@ -10,7 +10,7 @@
     <AssemblyName>CUITNet</AssemblyName>
     <RootNamespace>CUITNet.App</RootNamespace>
     <Product>CUIT 校园网</Product>
-    <Version>0.1.0</Version>
+    <Version>0.1.1</Version>
     <ApplicationIcon Condition="Exists('app.ico')">app.ico</ApplicationIcon>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <!-- .NET 9 的 Fluent 主题（ThemeMode）仍标记为实验性 API -->

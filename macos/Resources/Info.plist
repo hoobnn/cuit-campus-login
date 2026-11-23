@@ -16,9 +16,9 @@
 	<string>APPL</string>
 	<!-- 发版时两者一起改，tag 必须与 CFBundleShortVersionString 一致（见 docs/RELEASE.md） -->
 	<key>CFBundleShortVersionString</key>
-	<string>0.1.0</string>
+	<string>0.1.1</string>
 	<key>CFBundleVersion</key>
-	<string>0.1.0</string>
+	<string>0.1.1</string>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>zh_CN</string>
 	<key>LSMinimumSystemVersion</key>
