@@ -159,6 +159,12 @@ public sealed class AppModel : INotifyPropertyChanged
         await RefreshAsync();
     }
 
+    public void ClearLog()
+    {
+        Activity.Clear();
+        try { File.WriteAllText(_logPath, ""); } catch (IOException) { }
+    }
+
     public void OpenLog()
     {
         if (!File.Exists(_logPath)) File.WriteAllText(_logPath, "");

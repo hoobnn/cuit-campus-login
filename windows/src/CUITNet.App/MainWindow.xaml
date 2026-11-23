@@ -174,7 +174,10 @@
           <ColumnDefinition Width="Auto" />
         </Grid.ColumnDefinitions>
         <Button Content="检测状态" Click="Refresh_Click" Margin="0,0,8,0" />
-        <Button Grid.Column="1" Content="打开日志" Click="OpenLog_Click" />
+        <StackPanel Grid.Column="1" Orientation="Horizontal">
+          <Button Content="打开日志" Click="OpenLog_Click" Margin="0,0,8,0" />
+          <Button Content="清空日志" Click="ClearLog_Click" />
+        </StackPanel>
         <TextBlock x:Name="ErrorText" Grid.Column="2" Margin="12,0" VerticalAlignment="Center"
                    Foreground="#C42B1C" TextTrimming="CharacterEllipsis" />
         <Button Grid.Column="3" Content="保存并登录" MinWidth="120" IsDefault="True"

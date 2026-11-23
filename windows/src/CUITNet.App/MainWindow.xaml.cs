@@ -63,6 +63,8 @@ public partial class MainWindow : Window
 
     void OpenLog_Click(object sender, RoutedEventArgs e) => _model.OpenLog();
 
+    void ClearLog_Click(object sender, RoutedEventArgs e) => _model.ClearLog();
+
     void SelfService_Click(object sender, RoutedEventArgs e) => _model.OpenSelfService();
 
     protected override void OnClosing(CancelEventArgs e)

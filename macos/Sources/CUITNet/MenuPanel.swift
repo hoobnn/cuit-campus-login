@@ -37,7 +37,13 @@ struct MenuPanel: View {
             Divider()
             HStack {
                 Button("设置…") { SettingsWindow.show() }
-                Button("日志") { model.openLog() }
+                Menu("日志") {
+                    Button("打开日志") { model.openLog() }
+                    Button("清空日志", role: .destructive) { model.clearLog() }
+                }
+                .menuStyle(.borderlessButton)
+                .menuIndicator(.hidden)
+                .fixedSize()
                 if updater.canCheck {
                     Button("检查更新…") { updater.checkForUpdates() }
                 }

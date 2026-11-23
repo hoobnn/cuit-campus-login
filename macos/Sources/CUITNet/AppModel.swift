@@ -153,6 +153,11 @@ final class AppModel {
 
     func openLog() { NSWorkspace.shared.open(logURL) }
 
+    func clearLog() {
+        activity.removeAll()
+        try? Data().write(to: logURL)
+    }
+
     func openSelfService() {
         if let url = URL(string: portal.trimmingCharacters(in: CharacterSet(charactersIn: "/")) + "/self/index") {
             NSWorkspace.shared.open(url)
