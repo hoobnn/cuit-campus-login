@@ -25,6 +25,11 @@ final class AppDelegate: NSObject, NSApplicationDelegate {
         _ = Updater.shared  // 启动 Sparkle 的定期检查
         if !AppModel.shared.hasAccount { SettingsWindow.show() }
         #if DEBUG
+        // 离屏渲染面板到 PNG（浅色 / 深色 × 几种状态）：CUITNET_RENDER_PANEL=<目录> swift run
+        if let dir = ProcessInfo.processInfo.environment["CUITNET_RENDER_PANEL"] {
+            PanelRenderer.render(to: URL(fileURLWithPath: dir))
+            NSApp.terminate(nil)
+        }
         // 截图预览菜单栏面板：CUITNET_PREVIEW_PANEL=1 swift run
         if ProcessInfo.processInfo.environment["CUITNET_PREVIEW_PANEL"] != nil {
             let w = NSWindow(contentViewController: NSHostingController(rootView: MenuPanel().environment(AppModel.shared)))

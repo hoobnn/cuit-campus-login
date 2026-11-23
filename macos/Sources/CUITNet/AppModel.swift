@@ -251,6 +251,14 @@ final class AppModel {
         }
     }
 
+    #if DEBUG
+    /// 仅调试：离屏渲染面板时注入示例状态，不写日志文件。
+    func previewState(_ s: Status, activity samples: [(String, Bool)]) {
+        status = s
+        activity = samples.map { ActivityEntry(text: $0.0, isError: $0.1) }
+    }
+    #endif
+
     // MARK: 记录
 
     private func record(_ text: String, error: Bool = false) {
