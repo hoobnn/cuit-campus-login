@@ -195,6 +195,8 @@ final class AppModel {
         }
         await refresh()
         if status == .online { backoff = 0; return 60 }
+        // 本机根本没网（Wi‑Fi 未连上、刚唤醒）时去登录只会失败刷日志；网络恢复时 NWPathMonitor 会 poke
+        if status == .noNetwork { return 60 }
         guard hasAccount else { return 30 }
         if await attemptLogin(force: false) { backoff = 0; return 60 }
         if case .rejected = status { rejectedFingerprint = fingerprint(); return 30 }

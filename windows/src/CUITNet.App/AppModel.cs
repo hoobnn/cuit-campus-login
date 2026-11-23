@@ -212,6 +212,8 @@ public sealed class AppModel : INotifyPropertyChanged
         }
         await RefreshAsync();
         if (Status == StatusKind.Online) return (60, 0);
+        // 本机根本没网（未连 Wi‑Fi、刚唤醒）时去登录只会失败刷日志；网络恢复时 NetworkAddressChanged 会 Poke
+        if (Status == StatusKind.NoNetwork) return (60, backoff);
         if (!HasAccount) return (30, backoff);
         if (await AttemptLoginAsync()) return (60, 0);
         if (Status == StatusKind.Rejected) { _rejectedFingerprint = Fingerprint(); return (30, backoff); }
