@@ -271,7 +271,7 @@ private struct CapsuleButtonStyle: ButtonStyle {
 private struct GroupShape: Shape {
     func path(in rect: CGRect) -> Path {
         if #available(macOS 26, *) {
-            ConcentricRectangle(corners: .concentric(minimum: .fixed(10)), isUniform: true).path(in: rect)
+            ConcentricRectangle(corners: .concentric(minimum: 10), isUniform: true).path(in: rect)
         } else {
             RoundedRectangle(cornerRadius: 10, style: .continuous).path(in: rect)
         }
