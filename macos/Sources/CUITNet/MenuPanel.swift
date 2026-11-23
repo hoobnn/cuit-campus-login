@@ -270,11 +270,12 @@ private struct CapsuleButtonStyle: ButtonStyle {
 /// 老系统没有这套机制，退回固定的连续曲率圆角。
 private struct GroupShape: Shape {
     func path(in rect: CGRect) -> Path {
+        #if compiler(>=6.2)  // macOS 26 SDK 才有 ConcentricRectangle；旧 Xcode 编译时直接用固定圆角
         if #available(macOS 26, *) {
-            ConcentricRectangle(corners: .concentric(minimum: 10), isUniform: true).path(in: rect)
-        } else {
-            RoundedRectangle(cornerRadius: 10, style: .continuous).path(in: rect)
+            return ConcentricRectangle(corners: .concentric(minimum: 10), isUniform: true).path(in: rect)
         }
+        #endif
+        return RoundedRectangle(cornerRadius: 10, style: .continuous).path(in: rect)
     }
 }
 
